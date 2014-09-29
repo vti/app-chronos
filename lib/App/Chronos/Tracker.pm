@@ -12,10 +12,11 @@ sub new {
     my $self = {};
     bless $self, $class;
 
-    $self->{idle_timeout} = $params{idle_timeout} || 10;
-    $self->{filters}      = $params{filters};
-    $self->{on_start}     = $params{on_start};
-    $self->{on_end}       = $params{on_end};
+    $self->{idle_timeout}  = $params{idle_timeout}  || 300;
+    $self->{flush_timeout} = $params{flush_timeout} || 300;
+    $self->{filters}       = $params{filters};
+    $self->{on_start}      = $params{on_start};
+    $self->{on_end}        = $params{on_end};
 
     return $self;
 }
@@ -23,7 +24,7 @@ sub new {
 sub track {
     my $self = shift;
 
-    if ($self->_idle_time > $self->{idle_timeout}) {
+    if ($self->_is_idle || $self->_is_time_to_flush) {
         $self->{on_end}->($self->_time, $self->{prev})
           if %{$self->{prev} || {}};
         $self->{prev} = {};
@@ -44,6 +45,7 @@ sub track {
         last if $rv;
     }
 
+    $info->{$_} //= '' for (qw/id name role class/);
     $info->{activity} ||= 'other';
 
     if (  !$prev->{id}
@@ -58,9 +60,27 @@ sub track {
     }
 
     $self->{prev} = $info;
-    $self->{prev}->{_start} ||= $time;
 
     return $self;
+}
+
+sub _is_idle {
+    my $self = shift;
+
+    return $self->_idle_time > $self->{idle_timeout};
+}
+
+sub _is_time_to_flush {
+    my $self = shift;
+
+    $self->{flush_time} //= $self->_time;
+
+    if ($self->_time - $self->{flush_time} > $self->{flush_timeout}) {
+        $self->{flush_time} = $self->_time;
+        return 1;
+    }
+
+    return 0;
 }
 
 sub _build_x11 {

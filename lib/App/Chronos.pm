@@ -21,8 +21,9 @@ sub new {
 
     $self->{logger}  = App::Chronos::Logger->build($params{logger});
     $self->{tracker} = App::Chronos::Tracker->new(
-        idle_timeout => $params{idle_timeout},
-        filters      => [
+        idle_timeout  => $params{idle_timeout},
+        flush_timeout => $params{flush_timeout},
+        filters       => [
             App::Chronos::Filter::Firefox->new,
             App::Chronos::Filter::Chromium->new,
             App::Chronos::Filter::Skype->new,
