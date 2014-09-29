@@ -11,18 +11,14 @@ sub log_start {
     my $self = shift;
     my ($start, $info) = @_;
 
-    $info->{_start} = $start;
-
-    #use Data::Dumper; warn Dumper($info);
-    #print $info->{name}, ' ', $start, '...';
+    print "\n", JSON::encode_json($info), ' start=', $start, ' ';
 }
 
 sub log_end {
     my $self = shift;
     my ($end, $info) = @_;
 
-    print JSON::encode_json({_end => $end, %$info}), "\n";
-    #print ' ', $end, "\n";
+    print 'end=', $end, "\n";
 }
 
 1;

@@ -44,6 +44,8 @@ sub track {
         last if $rv;
     }
 
+    $info->{activity} ||= 'other';
+
     if (  !$prev->{id}
         || $info->{id} ne $prev->{id}
         || $info->{name} ne $prev->{name}
