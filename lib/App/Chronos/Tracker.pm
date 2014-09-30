@@ -67,6 +67,7 @@ sub track {
     }
 
     $self->{prev} = $info;
+    $self->{prev}->{_start} ||= $self->_time;
 
     return $self;
 }

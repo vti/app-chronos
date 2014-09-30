@@ -46,6 +46,19 @@ subtest 'ignore lines with invalid json' => sub {
     is $printed, '';
 };
 
+subtest 'ignore lines with invalid dates' => sub {
+    my $report = _build_report(
+        from => 0,
+        to => 123,
+        content => \'{"activity":"foo"} start=123 end=1',
+        printed => \my $printed
+    );
+
+    $report->run;
+
+    is $printed, '';
+};
+
 subtest 'accumulate total run by default' => sub {
     my $report = _build_report(
         content => [

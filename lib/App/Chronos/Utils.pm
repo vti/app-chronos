@@ -32,6 +32,8 @@ sub are_hashes_equal {
 sub parse_time {
     my ($string) = @_;
 
+    return $string if $string =~ m/^\d+$/;
+
     my $format = '%Y-%m-%d';
     if ($string =~ m/ \d\d:\d\d:\d\d$/) {
         $format .= ' %T';

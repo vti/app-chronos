@@ -45,7 +45,7 @@ sub run {
     $from = parse_time($from);
     my $to = time;
 
-    $from = parse_time($self->{from}) if $self->{from};
+    $from = parse_time($self->{from}) if defined $self->{from};
     $to   = parse_time($self->{to})   if $self->{to};
 
     my @records;
@@ -56,6 +56,7 @@ sub run {
         next
           unless my ($json, $start, $end) =
           $line =~ m/^(.*?) start=(\d+) end=(\d+)$/;
+        next if $end < $start;
 
         next
           unless ($start >= $from && $start <= $to)
