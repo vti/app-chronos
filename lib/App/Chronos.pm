@@ -11,6 +11,7 @@ use App::Chronos::Filter::Firefox;
 use App::Chronos::Filter::Chromium;
 use App::Chronos::Filter::Skype;
 use App::Chronos::Filter::Pidgin;
+use App::Chronos::Filter::Thunderbird;
 
 sub new {
     my $class = shift;
@@ -28,6 +29,7 @@ sub new {
             App::Chronos::Filter::Chromium->new,
             App::Chronos::Filter::Skype->new,
             App::Chronos::Filter::Pidgin->new,
+            App::Chronos::Filter::Thunderbird->new,
         ],
         on_start => sub {
             my ($start, $info) = @_;
