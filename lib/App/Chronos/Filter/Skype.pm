@@ -15,7 +15,7 @@ sub run {
       && $info->{name} =~ m/Skype/;
 
     $info->{activity} = 'im';
-    ($info->{contact}) = $info->{name} =~ m/^"(.*?) - Skype/;
+    ($info->{contact}) = $info->{name} =~ m/^"(?:\[\d+\])?(.*?) - Skype/;
 
     return 1;
 }

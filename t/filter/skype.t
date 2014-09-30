@@ -53,6 +53,19 @@ subtest 'add contact' => sub {
     is $info->{contact}, 'name';
 };
 
+subtest 'remove contact prefix' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'ConversationsWindow',
+        class => '"skype", "Skype"',
+        name  => '"[1]name - Skype"'
+    };
+    my $ok = $filter->run($info);
+
+    is $info->{contact}, 'name';
+};
+
 sub _build_filter {
     return App::Chronos::Filter::Skype->new;
 }
