@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::MockTime ();
 use Test::MonkeyMock;
 use JSON       ();
 use File::Temp ();
@@ -54,7 +55,9 @@ subtest 'accumulate total run by default' => sub {
         printed => \my $printed
     );
 
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:10Z');
     $report->run;
+    Test::MockTime::restore_time();
 
     my @lines = split /\n/, $printed;
     is scalar @lines, 1;
@@ -71,7 +74,9 @@ subtest 'group by' => sub {
         printed => \my $printed
     );
 
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:10Z');
     $report->run;
+    Test::MockTime::restore_time();
 
     my @lines = split /\n/, $printed;
     is scalar @lines, 2;
@@ -89,7 +94,9 @@ subtest 'where' => sub {
         printed => \my $printed
     );
 
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:10Z');
     $report->run;
+    Test::MockTime::restore_time();
 
     my @lines = split /\n/, $printed;
     is scalar @lines, 1;
@@ -107,12 +114,54 @@ subtest 'fields' => sub {
         printed => \my $printed
     );
 
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:10Z');
     $report->run;
+    Test::MockTime::restore_time();
 
     my @lines = split /\n/, $printed;
     is scalar @lines, 2;
     like $lines[0], qr/00d 00:00:08 activity=bar foo=bar/;
     like $lines[1], qr/00d 00:00:01 activity=foo foo=bar/;
+};
+
+subtest 'show current day by default' => sub {
+    my $report = _build_report(
+        group_by => 'activity',
+        fields   => 'activity',
+        content  => [
+            {start => 1, end => 2,  json => {activity => 'foo'}},
+            {start => 24 * 3600, end => 24 * 3600 + 1, json => {activity => 'bar'}}
+        ],
+        printed => \my $printed
+    );
+
+    Test::MockTime::set_absolute_time('1970-01-02T23:59:59Z');
+    $report->run;
+    Test::MockTime::restore_time();
+
+    my @lines = split /\n/, $printed;
+    is scalar @lines, 1;
+    like $lines[0], qr/00d 00:00:01 activity=bar/;
+};
+
+subtest 'correctly show overlapping days' => sub {
+    my $report = _build_report(
+        group_by => 'activity',
+        fields   => 'activity',
+        content  => [
+            {start => 1, end => 2,  json => {activity => 'foo'}},
+            {start => 24 * 3600 - 15, end => 24 * 3600 + 1, json => {activity => 'bar'}}
+        ],
+        printed => \my $printed
+    );
+
+    Test::MockTime::set_absolute_time('1970-01-02T23:59:59Z');
+    $report->run;
+    Test::MockTime::restore_time();
+
+    my @lines = split /\n/, $printed;
+    is scalar @lines, 1;
+    like $lines[0], qr/00d 00:00:01 activity=bar/;
 };
 
 my $log_file;

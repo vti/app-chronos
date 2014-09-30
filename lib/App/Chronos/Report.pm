@@ -3,6 +3,7 @@ package App::Chronos::Report;
 use strict;
 use warnings;
 
+use Time::Piece;
 use JSON        ();
 use Digest::MD5 ();
 
@@ -36,6 +37,11 @@ sub run {
 
     open my $fh, '<', $self->{log_file} or die $!;
 
+    my @from = (gmtime(time))[3..5];
+    my $from = join '-', ($from[2] + 1900), ($from[1] + 1), $from[0];
+    $from = Time::Piece->strptime($from, '%Y-%m-%d')->epoch;
+    my $to = time;
+
     my @records;
     while (defined(my $line = <$fh>)) {
         chomp $line;
@@ -44,6 +50,11 @@ sub run {
         next
           unless my ($json, $start, $end) =
           $line =~ m/^(.*?) start=(\d+) end=(\d+)$/;
+
+        next unless $end >= $from && $end <= $to;
+        if ($start < $from) {
+            $start = $from;
+        }
 
         my $record = eval { JSON::decode_json($json); };
         next unless $record;
