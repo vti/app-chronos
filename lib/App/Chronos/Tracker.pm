@@ -25,9 +25,15 @@ sub track {
     my $self = shift;
 
     if ($self->_is_idle || $self->_is_time_to_flush) {
-        $self->{on_end}->($self->_time, $self->{prev})
-          if %{$self->{prev} || {}};
-        $self->{prev} = {};
+        my $time_duration =
+          $self->_is_idle ? $self->{idle_timeout} : $self->{flush_timeout};
+
+        if (%{$self->{prev} || {}}) {
+            my $time = $self->{prev}->{_start} + $time_duration;
+
+            $self->{on_end}->($time, $self->{prev});
+            $self->{prev} = {};
+        }
         return;
     }
 
@@ -56,6 +62,7 @@ sub track {
     {
         $self->{on_end}->($time, $prev) if %$prev;
 
+        $info->{_start} ||= $self->_time;
         $self->{on_start}->($time, $info);
     }
 

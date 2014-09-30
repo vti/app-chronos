@@ -25,6 +25,7 @@ subtest 'run on_start on start' => sub {
       [
         123,
         {
+            _start   => 123,
             activity => 'other',
             id       => 'foo',
             name     => '',
@@ -86,6 +87,33 @@ subtest 'not run on_end when idle but already finished' => sub {
     is $ended, 0;
 };
 
+subtest 'when idle_timeout set end time not to the absolute time' => sub {
+    my $ended = 0;
+
+    my $i = 0;
+    my $time;
+    my $x11 = _mock_x11([{id => 'foo'}, {id => 'foo'}]);
+    my $tracker = _build_tracker(
+        idle_timeout => 15,
+        idle_time    => sub { $i++ > 0 ? 100 : 0 },
+        x11          => $x11,
+        on_start => sub { },
+        on_end   => sub { $time = shift }
+    );
+
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:00Z');
+
+    $tracker->track;
+
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:20Z');
+
+    $tracker->track;
+
+    Test::MockTime::restore_time();
+
+    is $time, 15;
+};
+
 subtest 'run on_end when flush_timeout' => sub {
     my $ended = 0;
 
@@ -94,8 +122,8 @@ subtest 'run on_end when flush_timeout' => sub {
     my $tracker = _build_tracker(
         flush_timeout => 10,
         x11           => $x11,
-        on_start => sub { },
-        on_end   => sub { $ended++ }
+        on_start      => sub { },
+        on_end        => sub { $ended++ }
     );
 
     Test::MockTime::set_absolute_time('1970-01-01T00:00:00Z');
@@ -111,6 +139,32 @@ subtest 'run on_end when flush_timeout' => sub {
     is $ended, 1;
 };
 
+subtest 'when flush_timeout set end time not to the absolute time' => sub {
+    my $ended = 0;
+
+    my $i = 0;
+    my $time;
+    my $x11 = _mock_x11([{id => 'foo'}, {id => 'foo'}]);
+    my $tracker = _build_tracker(
+        flush_timeout => 10,
+        x11           => $x11,
+        on_start      => sub { },
+        on_end        => sub { $time = shift }
+    );
+
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:00Z');
+
+    $tracker->track;
+
+    Test::MockTime::set_absolute_time('1970-01-01T00:00:20Z');
+
+    $tracker->track;
+
+    Test::MockTime::restore_time();
+
+    is $time, 10;
+};
+
 subtest 'run on_end on end' => sub {
     my @args;
     my $ended = 0;
@@ -118,7 +172,7 @@ subtest 'run on_end on end' => sub {
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
         x11      => $x11,
-        time => '123',
+        time     => '123',
         on_start => sub { },
         on_end   => sub { @args = @_; $ended++ }
     );
@@ -131,6 +185,7 @@ subtest 'run on_end on end' => sub {
       [
         123,
         {
+            _start   => 123,
             id       => 'foo',
             activity => 'other',
             name     => '',
