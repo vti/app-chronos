@@ -129,8 +129,12 @@ subtest 'show current day by default' => sub {
         group_by => 'activity',
         fields   => 'activity',
         content  => [
-            {start => 1, end => 2,  json => {activity => 'foo'}},
-            {start => 24 * 3600, end => 24 * 3600 + 1, json => {activity => 'bar'}}
+            {start => 1, end => 2, json => {activity => 'foo'}},
+            {
+                start => 24 * 3600,
+                end   => 24 * 3600 + 1,
+                json  => {activity => 'bar'}
+            }
         ],
         printed => \my $printed
     );
@@ -144,13 +148,17 @@ subtest 'show current day by default' => sub {
     like $lines[0], qr/00d 00:00:01 activity=bar/;
 };
 
-subtest 'correctly show overlapping days' => sub {
+subtest 'correctly show overlapping start date' => sub {
     my $report = _build_report(
         group_by => 'activity',
         fields   => 'activity',
         content  => [
-            {start => 1, end => 2,  json => {activity => 'foo'}},
-            {start => 24 * 3600 - 15, end => 24 * 3600 + 1, json => {activity => 'bar'}}
+            {start => 1, end => 2, json => {activity => 'foo'}},
+            {
+                start => 24 * 3600 - 15,
+                end   => 24 * 3600 + 1,
+                json  => {activity => 'bar'}
+            }
         ],
         printed => \my $printed
     );
@@ -162,6 +170,30 @@ subtest 'correctly show overlapping days' => sub {
     my @lines = split /\n/, $printed;
     is scalar @lines, 1;
     like $lines[0], qr/00d 00:00:01 activity=bar/;
+};
+
+subtest 'correctly show overlapping end date' => sub {
+    my $report = _build_report(
+        group_by => 'activity',
+        fields   => 'activity',
+        from     => '1970-01-02 00:00:00',
+        to       => '1970-01-02 00:00:10',
+        content  => [
+            {start => 1, end => 2, json => {activity => 'foo'}},
+            {
+                start => 24 * 3600,
+                end   => 24 * 3600 + 100,
+                json  => {activity => 'bar'}
+            }
+        ],
+        printed => \my $printed
+    );
+
+    $report->run;
+
+    my @lines = split /\n/, $printed;
+    is scalar @lines, 1;
+    like $lines[0], qr/00d 00:00:10 activity=bar/;
 };
 
 my $log_file;

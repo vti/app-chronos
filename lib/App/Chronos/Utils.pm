@@ -5,7 +5,9 @@ use warnings;
 
 use base 'Exporter';
 
-our @EXPORT_OK = qw(are_hashes_equal);
+our @EXPORT_OK = qw(are_hashes_equal parse_time);
+
+use Time::Piece;
 
 sub are_hashes_equal {
     my ($first, $second) = @_;
@@ -27,5 +29,14 @@ sub are_hashes_equal {
     return 1;
 }
 
+sub parse_time {
+    my ($string) = @_;
+
+    my $format = '%Y-%m-%d';
+    if ($string =~ m/ \d\d:\d\d:\d\d$/) {
+        $format .= ' %T';
+    }
+    return Time::Piece->strptime($string, $format)->epoch;
+}
 
 1;

@@ -6,6 +6,7 @@ use warnings;
 use Time::Piece;
 use JSON        ();
 use Digest::MD5 ();
+use App::Chronos::Utils qw(parse_time);
 
 sub new {
     my $class = shift;
@@ -18,6 +19,8 @@ sub new {
     $self->{where}    = $params{where};
     $self->{group_by} = $params{group_by};
     $self->{fields}   = $params{fields};
+    $self->{from}     = $params{from};
+    $self->{to}       = $params{to};
 
     return $self;
 }
@@ -37,10 +40,13 @@ sub run {
 
     open my $fh, '<', $self->{log_file} or die $!;
 
-    my @from = (gmtime(time))[3..5];
+    my @from = (gmtime(time))[3 .. 5];
     my $from = join '-', ($from[2] + 1900), ($from[1] + 1), $from[0];
-    $from = Time::Piece->strptime($from, '%Y-%m-%d')->epoch;
+    $from = parse_time($from);
     my $to = time;
+
+    $from = parse_time($self->{from}) if $self->{from};
+    $to   = parse_time($self->{to})   if $self->{to};
 
     my @records;
     while (defined(my $line = <$fh>)) {
@@ -51,9 +57,14 @@ sub run {
           unless my ($json, $start, $end) =
           $line =~ m/^(.*?) start=(\d+) end=(\d+)$/;
 
-        next unless $end >= $from && $end <= $to;
+        next
+          unless ($start >= $from && $start <= $to)
+          || ($end >= $from && $end <= $to);
         if ($start < $from) {
             $start = $from;
+        }
+        if ($end > $to) {
+            $end = $to;
         }
 
         my $record = eval { JSON::decode_json($json); };
