@@ -24,9 +24,8 @@ sub new {
 sub track {
     my $self = shift;
 
-    if ($self->_is_idle || $self->_is_time_to_flush) {
-        my $time_duration =
-          $self->_is_idle ? $self->{idle_timeout} : $self->{flush_timeout};
+    if ($self->_is_time_to_flush) {
+        my $time_duration = $self->{flush_timeout};
 
         if (%{$self->{prev} || {}}) {
             my $time = $self->{prev}->{_start} + $time_duration;
@@ -34,22 +33,23 @@ sub track {
             $self->{on_end}->($time, $self->{prev});
             $self->{prev} = {};
         }
-        return;
     }
 
     my $x11 = $self->{x11} ||= $self->_build_x11;
-    my $info = $x11->get_active_window;
+
+    my $info;
+    if ($x11->idle_time > $self->{idle_timeout}) {
+        $info = {activity => 'idle'};
+    }
+    else {
+        $info = $x11->get_active_window;
+    }
 
     my $prev = $self->{prev} ||= {};
     my $time = $self->_time;
 
-    foreach my $filter (@{$self->{filters}}) {
-        local $@;
-        my $rv = eval { $filter->run($info) };
-        next if $@;
-
-        last if $rv;
-    }
+    $self->_run_filters($info)
+      unless $info->{activity} && $info->{activity} eq 'idle';
 
     $info->{$_} //= '' for (qw/id name role class/);
     $info->{activity} ||= 'other';
@@ -72,10 +72,17 @@ sub track {
     return $self;
 }
 
-sub _is_idle {
+sub _run_filters {
     my $self = shift;
+    my ($info) = @_;
 
-    return $self->_idle_time > $self->{idle_timeout};
+    foreach my $filter (@{$self->{filters}}) {
+        local $@;
+        my $rv = eval { $filter->run($info) };
+        next if $@;
+
+        last if $rv;
+    }
 }
 
 sub _is_time_to_flush {
@@ -95,7 +102,6 @@ sub _build_x11 {
     return App::Chronos::X11->new;
 }
 
-sub _idle_time { int(`xprintidle` / 1000) }
-sub _time      { time }
+sub _time { time }
 
 1;

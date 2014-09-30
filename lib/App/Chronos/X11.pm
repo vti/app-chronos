@@ -21,12 +21,13 @@ sub get_active_window {
     return $info;
 }
 
+sub idle_time { int(`xprintidle` / 1000) }
+
 sub _get_window_info {
     my $self = shift;
     my ($id) = @_;
 
     my $dump = $self->_run_xprop('-id', $id);
-    #warn $dump;
 
     my $info = {};
     $info->{id} = $id;
