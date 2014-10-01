@@ -15,7 +15,6 @@ sub new {
     $self->{idle_timeout}  = $params{idle_timeout}  || 300;
     $self->{flush_timeout} = $params{flush_timeout} || 300;
     $self->{applications}  = $params{applications};
-    $self->{on_start}      = $params{on_start};
     $self->{on_end}        = $params{on_end};
 
     return $self;
@@ -25,12 +24,11 @@ sub track {
     my $self = shift;
 
     if ($self->_is_time_to_flush) {
-        my $time_duration = $self->{flush_timeout};
-
         if (%{$self->{prev} || {}}) {
-            my $time = $self->{prev}->{_start} + $time_duration;
+            $self->{prev}->{_end} =
+              $self->{prev}->{_start} + $self->{flush_timeout};
 
-            $self->{on_end}->($time, $self->{prev});
+            $self->{on_end}->($self->{prev});
             $self->{prev} = {};
         }
     }
@@ -60,14 +58,16 @@ sub track {
         || $info->{role} ne $prev->{role}
         || $info->{class} ne $prev->{class})
     {
-        $self->{on_end}->($time, $prev) if %$prev;
+        if (%$prev) {
+            $prev->{_end} = $time;
+            $self->{on_end}->($prev);
+        }
 
-        $info->{_start} ||= $self->_time;
-        $self->{on_start}->($time, $info);
+        $info->{_start} ||= $time;
     }
 
     $self->{prev} = $info;
-    $self->{prev}->{_start} ||= $self->_time;
+    $self->{prev}->{_start} ||= $time;
 
     return $self;
 }

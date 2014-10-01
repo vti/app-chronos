@@ -7,18 +7,11 @@ use base 'App::Chronos::Logger::Base';
 
 use JSON ();
 
-sub log_start {
+sub log {
     my $self = shift;
-    my ($start, $info) = @_;
+    my ($info) = @_;
 
-    print "\n", JSON::encode_json($info), ' start=', $start, ' ';
-}
-
-sub log_end {
-    my $self = shift;
-    my ($end, $info) = @_;
-
-    print 'end=', $end, "\n";
+    print JSON::encode_json($info), "\n";
 }
 
 1;

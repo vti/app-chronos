@@ -31,15 +31,10 @@ sub new {
             App::Chronos::Application::Pidgin->new,
             App::Chronos::Application::Thunderbird->new,
         ],
-        on_start => sub {
-            my ($start, $info) = @_;
-
-            $self->{logger}->log_start($start, $info);
-        },
         on_end => sub {
-            my ($end, $info) = @_;
+            my ($info) = @_;
 
-            $self->{logger}->log_end($end, $info);
+            $self->{logger}->log($info);
         }
     );
 

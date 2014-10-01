@@ -53,10 +53,12 @@ sub run {
         chomp $line;
         next unless $line;
 
-        next
-          unless my ($json, $start, $end) =
-          $line =~ m/^(.*?) start=(\d+) end=(\d+)$/;
-        next if $end < $start;
+        my $record = eval { JSON::decode_json($line) };
+        next unless $record;
+
+        my $start = $record->{_start};
+        my $end   = $record->{_end};
+        next if !$start || !$end || $end < $start;
 
         next
           unless ($start >= $from && $start <= $to)
@@ -67,9 +69,6 @@ sub run {
         if ($end > $to) {
             $end = $to;
         }
-
-        my $record = eval { JSON::decode_json($json); };
-        next unless $record;
 
         next if $where_cb && !$where_cb->($record);
 

@@ -7,42 +7,13 @@ use Test::MockTime ();
 use Test::MonkeyMock;
 use App::Chronos::Tracker;
 
-subtest 'run on_start on start' => sub {
-    my @args;
-    my $started = 0;
-
-    my $x11 = _mock_x11([{id => 'foo'}]);
-    my $tracker = _build_tracker(
-        x11      => $x11,
-        time     => '123',
-        on_start => sub { @args = @_; $started++ }
-    );
-
-    $tracker->track;
-
-    is $started, 1;
-    is_deeply \@args,
-      [
-        123,
-        {
-            _start   => 123,
-            activity => 'other',
-            id       => 'foo',
-            name     => '',
-            class    => '',
-            role     => ''
-        }
-      ];
-};
-
 subtest 'not run on_end when same info' => sub {
     my $ended = 0;
 
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'foo'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        on_start => sub { },
-        on_end   => sub { $ended++ }
+        x11    => $x11,
+        on_end => sub { $ended++ }
     );
 
     $tracker->track;
@@ -59,10 +30,10 @@ subtest 'create idle activity when idle' => sub {
     my $tracker = _build_tracker(
         idle_timeout => 10,
         x11          => $x11,
-        on_start     => sub { shift; @args = @_ },
-        on_end => sub { }
+        on_end       => sub { @args = @_ }
     );
 
+    $tracker->track;
     $tracker->track;
 
     is $args[0]->{activity}, 'idle';
@@ -75,7 +46,6 @@ subtest 'finish previous activity when idle' => sub {
     my $tracker = _build_tracker(
         idle_timeout => 10,
         x11          => $x11,
-        on_start     => sub { },
         on_end       => sub { $ended++ }
     );
 
@@ -95,7 +65,6 @@ subtest 'run on_end when flush_timeout' => sub {
     my $tracker = _build_tracker(
         flush_timeout => 10,
         x11           => $x11,
-        on_start      => sub { },
         on_end        => sub { $ended++ }
     );
 
@@ -113,16 +82,12 @@ subtest 'run on_end when flush_timeout' => sub {
 };
 
 subtest 'when flush_timeout set end time not to the absolute time' => sub {
-    my $ended = 0;
-
-    my $i = 0;
     my $time;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'foo'}]);
     my $tracker = _build_tracker(
         flush_timeout => 10,
         x11           => $x11,
-        on_start      => sub { },
-        on_end        => sub { $time = shift }
+        on_end        => sub { $time = $_[0]->{_end} }
     );
 
     Test::MockTime::set_absolute_time('1970-01-01T00:00:00Z');
@@ -144,9 +109,8 @@ subtest 'not run on_end when nothing to flush' => sub {
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'foo'}]);
     my $tracker = _build_tracker(
         flush_timeout => 10,
-        x11          => $x11,
-        on_start     => sub { },
-        on_end       => sub { $ended++ }
+        x11           => $x11,
+        on_end        => sub { $ended++ }
     );
 
     Test::MockTime::set_absolute_time('1970-01-01T00:00:00Z');
@@ -155,11 +119,9 @@ subtest 'not run on_end when nothing to flush' => sub {
 
     Test::MockTime::set_absolute_time('1970-01-01T00:00:20Z');
 
-    $tracker->track;
-
     Test::MockTime::restore_time();
 
-    is $ended, 1;
+    is $ended, 0;
 };
 
 subtest 'run on_end on end' => sub {
@@ -168,10 +130,9 @@ subtest 'run on_end on end' => sub {
 
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        time     => '123',
-        on_start => sub { },
-        on_end   => sub { @args = @_; $ended++ }
+        x11    => $x11,
+        time   => '123',
+        on_end => sub { @args = @_; $ended++ }
     );
 
     $tracker->track;
@@ -180,9 +141,9 @@ subtest 'run on_end on end' => sub {
     is $ended, 1;
     is_deeply \@args,
       [
-        123,
         {
             _start   => 123,
+            _end     => 123,
             id       => 'foo',
             activity => 'other',
             name     => '',
@@ -196,26 +157,22 @@ subtest 'run applications' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        on_start => sub { },
-        on_end   => sub { @args = @_ },
-        applications  => [TestApplication->new]
+        x11          => $x11,
+        on_end       => sub { @args = @_ },
+        applications => [TestApplication->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{application}, 1;
+    is $args[0]->{application}, 1;
 };
 
 subtest 'catch application exceptions' => sub {
-    my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        on_start => sub { },
-        on_end   => sub { @args = @_ },
-        applications  => [TestApplicationError->new]
+        x11          => $x11,
+        applications => [TestApplicationError->new]
     );
 
     ok !exception { $tracker->track };
@@ -225,32 +182,30 @@ subtest 'stop when application returns true' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        on_start => sub { },
-        on_end   => sub { @args = @_ },
+        x11    => $x11,
+        on_end => sub { @args = @_ },
         applications => [TestApplication->new, TestApplication->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{application}, 1;
+    is $args[0]->{application}, 1;
 };
 
 subtest 'not stop when application returns false' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
-        x11      => $x11,
-        on_start => sub { },
-        on_end   => sub { @args = @_ },
+        x11    => $x11,
+        on_end => sub { @args = @_ },
         applications => [TestApplicationFalse->new, TestApplicationFalse->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{application}, 2;
+    is $args[0]->{application}, 2;
 };
 
 sub _mock_x11 {

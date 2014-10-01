@@ -48,8 +48,8 @@ subtest 'ignore lines with invalid json' => sub {
 
 subtest 'ignore lines with invalid dates' => sub {
     my $report = _build_report(
-        from => 0,
-        to => 123,
+        from    => 0,
+        to      => 123,
         content => \'{"activity":"foo"} start=123 end=1',
         printed => \my $printed
     );
@@ -62,8 +62,8 @@ subtest 'ignore lines with invalid dates' => sub {
 subtest 'accumulate total run by default' => sub {
     my $report = _build_report(
         content => [
-            {start => 1, end => 2,  json => {activity => 'foo', foo => 'bar'}},
-            {start => 2, end => 10, json => {activity => 'foo', foo => 'bar'}}
+            {_start => 1, _end => 2,  activity => 'foo', foo => 'bar'},
+            {_start => 2, _end => 10, activity => 'foo', foo => 'bar'}
         ],
         printed => \my $printed
     );
@@ -81,8 +81,8 @@ subtest 'group by' => sub {
     my $report = _build_report(
         group_by => 'activity',
         content  => [
-            {start => 1, end => 2,  json => {activity => 'foo', foo => 'bar'}},
-            {start => 2, end => 10, json => {activity => 'bar', foo => 'bar'}}
+            {_start => 1, _end => 2,  activity => 'foo', foo => 'bar'},
+            {_start => 2, _end => 10, activity => 'bar', foo => 'bar'}
         ],
         printed => \my $printed
     );
@@ -101,8 +101,8 @@ subtest 'where' => sub {
     my $report = _build_report(
         where   => '$activity eq "foo"',
         content => [
-            {start => 1, end => 2,  json => {activity => 'foo', foo => 'bar'}},
-            {start => 2, end => 10, json => {activity => 'bar', foo => 'bar'}}
+            {_start => 1, _end => 2,  activity => 'foo', foo => 'bar'},
+            {_start => 2, _end => 10, activity => 'bar', foo => 'bar'}
         ],
         printed => \my $printed
     );
@@ -121,8 +121,8 @@ subtest 'fields' => sub {
         group_by => 'activity',
         fields   => 'activity,foo',
         content  => [
-            {start => 1, end => 2,  json => {activity => 'foo', foo => 'bar'}},
-            {start => 2, end => 10, json => {activity => 'bar', foo => 'bar'}}
+            {_start => 1, _end => 2,  activity => 'foo', foo => 'bar'},
+            {_start => 2, _end => 10, activity => 'bar', foo => 'bar'}
         ],
         printed => \my $printed
     );
@@ -142,12 +142,8 @@ subtest 'show current day by default' => sub {
         group_by => 'activity',
         fields   => 'activity',
         content  => [
-            {start => 1, end => 2, json => {activity => 'foo'}},
-            {
-                start => 24 * 3600,
-                end   => 24 * 3600 + 1,
-                json  => {activity => 'bar'}
-            }
+            {_start => 1,         _end => 2,             activity => 'foo'},
+            {_start => 24 * 3600, _end => 24 * 3600 + 1, activity => 'bar'}
         ],
         printed => \my $printed
     );
@@ -166,11 +162,11 @@ subtest 'correctly show overlapping start date' => sub {
         group_by => 'activity',
         fields   => 'activity',
         content  => [
-            {start => 1, end => 2, json => {activity => 'foo'}},
+            {_start => 1, _end => 2, activity => 'foo'},
             {
-                start => 24 * 3600 - 15,
-                end   => 24 * 3600 + 1,
-                json  => {activity => 'bar'}
+                _start   => 24 * 3600 - 15,
+                _end     => 24 * 3600 + 1,
+                activity => 'bar'
             }
         ],
         printed => \my $printed
@@ -192,12 +188,8 @@ subtest 'correctly show overlapping end date' => sub {
         from     => '1970-01-02 00:00:00',
         to       => '1970-01-02 00:00:10',
         content  => [
-            {start => 1, end => 2, json => {activity => 'foo'}},
-            {
-                start => 24 * 3600,
-                end   => 24 * 3600 + 100,
-                json  => {activity => 'bar'}
-            }
+            {_start => 1,         _end => 2,               activity => 'foo'},
+            {_start => 24 * 3600, _end => 24 * 3600 + 100, activity => 'bar'}
         ],
         printed => \my $printed
     );
@@ -221,8 +213,7 @@ sub _build_report {
     }
     else {
         foreach my $entry (@$content) {
-            print $log_file JSON::encode_json($entry->{json}),
-              ' start=' . $entry->{start} . ' end=' . $entry->{end}, "\n";
+            print $log_file JSON::encode_json($entry), "\n";
         }
     }
     seek $log_file, 0, 0;

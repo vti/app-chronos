@@ -12,11 +12,7 @@ sub new {
     return $self;
 }
 
-sub log_start {
-    ...
-}
-
-sub log_end {
+sub log {
     ...
 }
 
