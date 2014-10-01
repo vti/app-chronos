@@ -71,12 +71,40 @@ subtest 'find last accessed url' => sub {
     is $info->{url}, 'latest.bar';
 };
 
+subtest 'set empty url when not available' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'browser',
+        class => 'Navigator',
+        name  => 'Firefox'
+    };
+
+    my $ok = $filter->run($info);
+
+    is $info->{url}, '';
+};
+
+subtest 'add activity' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'browser',
+        class => 'Navigator',
+        name  => 'Firefox'
+    };
+
+    my $ok = $filter->run($info);
+
+    is $info->{activity}, 'browser';
+};
+
 sub _build_filter {
     my (%params) = @_;
 
     my $filter = App::Chronos::Application::Firefox->new;
     $filter = Test::MonkeyMock->new($filter);
-    $filter->mock(_slurp_session => sub { $params{session} || '' });
+    $filter->mock(_slurp_session => sub { $params{session} || '{}' });
     return $filter;
 }
 

@@ -27,6 +27,19 @@ subtest 'return true when known' => sub {
     ok $ok;
 };
 
+subtest 'add activity' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'MsgCompose',
+        class => '"MsgCompose", "Icedove"',
+        name  => 'Reply to: '
+    };
+    $filter->run($info);
+
+    is $info->{activity}, 'email';
+};
+
 sub _build_filter {
     return App::Chronos::Application::Thunderbird->new;
 }

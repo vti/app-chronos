@@ -41,7 +41,10 @@ sub _find_current_url {
 
     @tabs = sort { $b->{last_accessed} <=> $a->{last_accessed} } @tabs;
 
-    return URI->new($tabs[0]->{url})->host;
+    my $url = $tabs[0]->{url};
+    return '' unless $url;
+
+    return URI->new($url)->host;
 }
 
 sub _parse_current_session {
