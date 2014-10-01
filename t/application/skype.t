@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use App::Chronos::Filter::Skype;
+use App::Chronos::Application::Skype;
 
 subtest 'return false when unknown' => sub {
     my $filter = _build_filter();
@@ -67,7 +67,7 @@ subtest 'remove contact prefix' => sub {
 };
 
 sub _build_filter {
-    return App::Chronos::Filter::Skype->new;
+    return App::Chronos::Application::Skype->new;
 }
 
 done_testing;

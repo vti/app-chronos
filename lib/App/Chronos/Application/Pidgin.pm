@@ -1,9 +1,9 @@
-package App::Chronos::Filter::Pidgin;
+package App::Chronos::Application::Pidgin;
 
 use strict;
 use warnings;
 
-use base 'App::Chronos::Filter::Base';
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;

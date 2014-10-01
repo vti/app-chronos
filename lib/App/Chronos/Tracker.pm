@@ -14,7 +14,7 @@ sub new {
 
     $self->{idle_timeout}  = $params{idle_timeout}  || 300;
     $self->{flush_timeout} = $params{flush_timeout} || 300;
-    $self->{filters}       = $params{filters};
+    $self->{applications}       = $params{applications};
     $self->{on_start}      = $params{on_start};
     $self->{on_end}        = $params{on_end};
 
@@ -48,7 +48,7 @@ sub track {
     my $prev = $self->{prev} ||= {};
     my $time = $self->_time;
 
-    $self->_run_filters($info)
+    $self->_run_applications($info)
       unless $info->{activity} && $info->{activity} eq 'idle';
 
     $info->{$_} //= '' for (qw/id name role class/);
@@ -72,13 +72,13 @@ sub track {
     return $self;
 }
 
-sub _run_filters {
+sub _run_applications {
     my $self = shift;
     my ($info) = @_;
 
-    foreach my $filter (@{$self->{filters}}) {
+    foreach my $application (@{$self->{applications}}) {
         local $@;
-        my $rv = eval { $filter->run($info) };
+        my $rv = eval { $application->run($info) };
         next if $@;
 
         last if $rv;

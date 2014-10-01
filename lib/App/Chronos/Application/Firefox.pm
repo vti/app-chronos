@@ -1,9 +1,9 @@
-package App::Chronos::Filter::Firefox;
+package App::Chronos::Application::Firefox;
 
 use strict;
 use warnings;
 
-use base 'App::Chronos::Filter::Base';
+use base 'App::Chronos::Application::Base';
 
 use URI;
 use JSON ();

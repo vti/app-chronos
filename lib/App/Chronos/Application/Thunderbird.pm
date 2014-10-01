@@ -1,9 +1,9 @@
-package App::Chronos::Filter::Thunderbird;
+package App::Chronos::Application::Thunderbird;
 
 use strict;
 use warnings;
 
-use base 'App::Chronos::Filter::Base';
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use App::Chronos::Filter::Pidgin;
+use App::Chronos::Application::Pidgin;
 
 subtest 'return false when unknown' => sub {
     my $filter = _build_filter();
@@ -54,7 +54,7 @@ subtest 'add contact' => sub {
 };
 
 sub _build_filter {
-    return App::Chronos::Filter::Pidgin->new;
+    return App::Chronos::Application::Pidgin->new;
 }
 
 done_testing;

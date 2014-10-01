@@ -1,4 +1,4 @@
-package App::Chronos::Filter::Base;
+package App::Chronos::Application::Base;
 
 use strict;
 use warnings;

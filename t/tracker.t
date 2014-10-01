@@ -192,65 +192,65 @@ subtest 'run on_end on end' => sub {
       ];
 };
 
-subtest 'run filters' => sub {
+subtest 'run applications' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
         x11      => $x11,
         on_start => sub { },
         on_end   => sub { @args = @_ },
-        filters  => [TestFilter->new]
+        applications  => [TestApplication->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{filter}, 1;
+    is $args[1]->{application}, 1;
 };
 
-subtest 'catch filter exceptions' => sub {
+subtest 'catch application exceptions' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
         x11      => $x11,
         on_start => sub { },
         on_end   => sub { @args = @_ },
-        filters  => [TestFilterError->new]
+        applications  => [TestApplicationError->new]
     );
 
     ok !exception { $tracker->track };
 };
 
-subtest 'stop when filter returns true' => sub {
+subtest 'stop when application returns true' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
         x11      => $x11,
         on_start => sub { },
         on_end   => sub { @args = @_ },
-        filters => [TestFilter->new, TestFilter->new]
+        applications => [TestApplication->new, TestApplication->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{filter}, 1;
+    is $args[1]->{application}, 1;
 };
 
-subtest 'not stop when filter returns false' => sub {
+subtest 'not stop when application returns false' => sub {
     my @args;
     my $x11 = _mock_x11([{id => 'foo'}, {id => 'new'}]);
     my $tracker = _build_tracker(
         x11      => $x11,
         on_start => sub { },
         on_end   => sub { @args = @_ },
-        filters => [TestFilterFalse->new, TestFilterFalse->new]
+        applications => [TestApplicationFalse->new, TestApplicationFalse->new]
     );
 
     $tracker->track;
     $tracker->track;
 
-    is $args[1]->{filter}, 2;
+    is $args[1]->{application}, 2;
 };
 
 sub _mock_x11 {
@@ -277,32 +277,32 @@ sub _build_tracker {
 
 done_testing;
 
-package TestFilter;
-use base 'App::Chronos::Filter::Base';
+package TestApplication;
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;
     my ($info) = @_;
 
-    $info->{filter}++;
+    $info->{application}++;
 
     return 1;
 }
 
-package TestFilterFalse;
-use base 'App::Chronos::Filter::Base';
+package TestApplicationFalse;
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;
     my ($info) = @_;
 
-    $info->{filter}++;
+    $info->{application}++;
 
     return;
 }
 
-package TestFilterError;
-use base 'App::Chronos::Filter::Base';
+package TestApplicationError;
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;

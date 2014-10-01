@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use App::Chronos::Filter::Thunderbird;
+use App::Chronos::Application::Thunderbird;
 
 subtest 'return false when unknown' => sub {
     my $filter = _build_filter();
@@ -28,7 +28,7 @@ subtest 'return true when known' => sub {
 };
 
 sub _build_filter {
-    return App::Chronos::Filter::Thunderbird->new;
+    return App::Chronos::Application::Thunderbird->new;
 }
 
 done_testing;

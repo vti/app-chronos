@@ -7,11 +7,11 @@ our $VERSION = "0.01";
 
 use App::Chronos::Logger;
 use App::Chronos::Tracker;
-use App::Chronos::Filter::Firefox;
-use App::Chronos::Filter::Chromium;
-use App::Chronos::Filter::Skype;
-use App::Chronos::Filter::Pidgin;
-use App::Chronos::Filter::Thunderbird;
+use App::Chronos::Application::Firefox;
+use App::Chronos::Application::Chromium;
+use App::Chronos::Application::Skype;
+use App::Chronos::Application::Pidgin;
+use App::Chronos::Application::Thunderbird;
 
 sub new {
     my $class = shift;
@@ -24,12 +24,12 @@ sub new {
     $self->{tracker} = App::Chronos::Tracker->new(
         idle_timeout  => $params{idle_timeout},
         flush_timeout => $params{flush_timeout},
-        filters       => [
-            App::Chronos::Filter::Firefox->new,
-            App::Chronos::Filter::Chromium->new,
-            App::Chronos::Filter::Skype->new,
-            App::Chronos::Filter::Pidgin->new,
-            App::Chronos::Filter::Thunderbird->new,
+        applications  => [
+            App::Chronos::Application::Firefox->new,
+            App::Chronos::Application::Chromium->new,
+            App::Chronos::Application::Skype->new,
+            App::Chronos::Application::Pidgin->new,
+            App::Chronos::Application::Thunderbird->new,
         ],
         on_start => sub {
             my ($start, $info) = @_;

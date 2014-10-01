@@ -1,9 +1,9 @@
-package App::Chronos::Filter::Skype;
+package App::Chronos::Application::Skype;
 
 use strict;
 use warnings;
 
-use base 'App::Chronos::Filter::Base';
+use base 'App::Chronos::Application::Base';
 
 sub run {
     my $self = shift;

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::MonkeyMock;
 use JSON ();
-use App::Chronos::Filter::Firefox;
+use App::Chronos::Application::Firefox;
 
 subtest 'return false when unknown' => sub {
     my $filter = _build_filter();
@@ -74,7 +74,7 @@ subtest 'find last accessed url' => sub {
 sub _build_filter {
     my (%params) = @_;
 
-    my $filter = App::Chronos::Filter::Firefox->new;
+    my $filter = App::Chronos::Application::Firefox->new;
     $filter = Test::MonkeyMock->new($filter);
     $filter->mock(_slurp_session => sub { $params{session} || '' });
     return $filter;
