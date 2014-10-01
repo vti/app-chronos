@@ -14,7 +14,7 @@ sub new {
 
     $self->{idle_timeout}  = $params{idle_timeout}  || 300;
     $self->{flush_timeout} = $params{flush_timeout} || 300;
-    $self->{applications}       = $params{applications};
+    $self->{applications}  = $params{applications};
     $self->{on_start}      = $params{on_start};
     $self->{on_end}        = $params{on_end};
 

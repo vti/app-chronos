@@ -8,15 +8,6 @@ use base 'App::Chronos::Application::Base';
 use URI;
 use JSON ();
 
-sub new {
-    my $class = shift;
-
-    my $self = {};
-    bless $self, $class;
-
-    return $self;
-}
-
 sub run {
     my $self = shift;
     my ($info) = @_;
