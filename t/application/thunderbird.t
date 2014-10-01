@@ -27,7 +27,7 @@ subtest 'return true when known' => sub {
     ok $ok;
 };
 
-subtest 'add activity' => sub {
+subtest 'add application' => sub {
     my $filter = _build_filter();
 
     my $info = {
@@ -37,7 +37,7 @@ subtest 'add activity' => sub {
     };
     $filter->run($info);
 
-    is $info->{activity}, 'email';
+    is $info->{application}, 'Thunderbird';
 };
 
 sub _build_filter {

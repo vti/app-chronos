@@ -14,7 +14,7 @@ sub run {
       && $info->{class} =~ m/Skype/
       && $info->{name} =~ m/Skype/;
 
-    $info->{activity} = 'im';
+    $info->{application} = 'Skype';
     ($info->{contact}) = $info->{name} =~ m/^"(?:\[\d+\])?(.*?) - Skype/;
 
     return 1;

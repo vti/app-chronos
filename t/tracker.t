@@ -22,7 +22,7 @@ subtest 'not run on_end when same info' => sub {
     is $ended, 0;
 };
 
-subtest 'create idle activity when idle' => sub {
+subtest 'create idle when idle' => sub {
     my @args;
 
     my $x11 = _mock_x11([{id => 'foo'}]);
@@ -36,7 +36,7 @@ subtest 'create idle activity when idle' => sub {
     $tracker->track;
     $tracker->track;
 
-    is $args[0]->{activity}, 'idle';
+    ok $args[0]->{idle};
 };
 
 subtest 'finish previous activity when idle' => sub {
@@ -142,13 +142,13 @@ subtest 'run on_end on end' => sub {
     is_deeply \@args,
       [
         {
-            _start   => 123,
-            _end     => 123,
-            id       => 'foo',
-            activity => 'other',
-            name     => '',
-            class    => '',
-            role     => ''
+            _start      => 123,
+            _end        => 123,
+            id          => 'foo',
+            application => 'other',
+            name        => '',
+            class       => '',
+            role        => ''
         }
       ];
 };

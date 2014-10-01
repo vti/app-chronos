@@ -13,7 +13,7 @@ sub run {
       unless $info->{role} =~ m/conversation/
       && $info->{class} =~ m/Pidgin/;
 
-    $info->{activity} = 'im';
+    $info->{application} = 'Pidgin';
     ($info->{contact}) = $info->{name} =~ m/"(.*?)"/;
 
     return 1;

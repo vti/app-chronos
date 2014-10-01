@@ -85,7 +85,7 @@ subtest 'set empty url when not available' => sub {
     is $info->{url}, '';
 };
 
-subtest 'add activity' => sub {
+subtest 'add application' => sub {
     my $filter = _build_filter();
 
     my $info = {
@@ -96,7 +96,7 @@ subtest 'add activity' => sub {
 
     my $ok = $filter->run($info);
 
-    is $info->{activity}, 'browser';
+    is $info->{application}, 'Firefox';
 };
 
 sub _build_filter {

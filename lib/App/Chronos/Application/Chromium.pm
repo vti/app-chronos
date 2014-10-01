@@ -16,7 +16,7 @@ sub run {
       && $info->{name} =~ m/Chromium/
       && $info->{class} =~ m/Chromium/;
 
-    $info->{activity} = 'browser';
+    $info->{application} = 'Chromium';
     $info->{url} = $self->_find_current_url;
 
     return 1;

@@ -37,7 +37,7 @@ sub track {
 
     my $info;
     if ($x11->idle_time > $self->{idle_timeout}) {
-        $info = {activity => 'idle'};
+        $info = {idle => 1};
     }
     else {
         $info = $x11->get_active_window;
@@ -46,11 +46,10 @@ sub track {
     my $prev = $self->{prev} ||= {};
     my $time = $self->_time;
 
-    $self->_run_applications($info)
-      unless $info->{activity} && $info->{activity} eq 'idle';
+    $self->_run_applications($info) unless $info->{idle};
 
     $info->{$_} //= '' for (qw/id name role class/);
-    $info->{activity} ||= 'other';
+    $info->{application} ||= 'other';
 
     if (  !$prev->{id}
         || $info->{id} ne $prev->{id}

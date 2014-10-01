@@ -17,7 +17,7 @@ sub run {
       && $info->{class} =~ 'Navigator'
       && $info->{name} =~ m/(?:Iceweasel|Firefox)/;
 
-    $info->{activity} = 'browser';
+    $info->{application} = 'Firefox';
     $info->{url} = $self->_find_current_url;
 
     return 1;
