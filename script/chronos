@@ -1,0 +1,48 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Docopt;
+use App::Chronos;
+use App::Chronos::Report;
+
+my $opts = docopt();
+
+if ($opts->{report}) {
+    my $report = App::Chronos::Report->new(
+        log_file => $opts->{'<file>'},
+        fields   => $opts->{'--fields'},
+        where    => $opts->{'--where'},
+        group_by => $opts->{'--group_by'},
+        from     => $opts->{'--from'},
+        to       => $opts->{'--to'},
+    );
+    $report->run;
+}
+else {
+    my $app = App::Chronos->new(
+        logger        => 'stdout',
+        idle_timeout  => $opts->{'--idle_timeout'},
+        flush_timeout => $opts->{'--flush_timeout'}
+    );
+
+    while (1) {
+        $app->track;
+
+        sleep($opts->{'--timeout'} || 5);
+    }
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+  chronos [--timeout=<seconds>]
+          [--idle_timeout=<seconds>] [--flush_timeout=<seconds>]
+  chronos report [--fields=<fields>] [--where=<condition>] [--group_by=<fields>] <file>
+                 [--from=<time>] [--to=<time>]
+  chronos -h | --help
+
+  --timeout=<seconds> Timeout between runs [default: 5].
+  -h --help           Show this screen.
