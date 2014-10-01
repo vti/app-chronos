@@ -46,7 +46,7 @@ subtest 'add contact' => sub {
     my $info = {
         role  => '"conversation"',
         class => '"Pidgin", "Pidgin"',
-        name  => 'name'
+        name  => '"name"'
     };
     my $ok = $filter->run($info);
 
