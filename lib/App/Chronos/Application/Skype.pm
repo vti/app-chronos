@@ -10,11 +10,13 @@ sub run {
     my ($info) = @_;
 
     return
-      unless $info->{role} =~ m/ConversationsWindow/
+         unless $info->{role} =~ m/ConversationsWindow/
       && $info->{class} =~ m/Skype/
       && $info->{name} =~ m/Skype/;
 
     $info->{application} = 'Skype';
+    $info->{category}    = 'im';
+
     ($info->{contact}) = $info->{name} =~ m/^"(?:\[\d+\])?(.*?) - Skype/;
 
     return 1;

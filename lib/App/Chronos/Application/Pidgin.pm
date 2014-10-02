@@ -14,6 +14,8 @@ sub run {
       && $info->{class} =~ m/Pidgin/;
 
     $info->{application} = 'Pidgin';
+    $info->{category}    = 'im';
+
     ($info->{contact}) = $info->{name} =~ m/"(.*?)"/;
 
     return 1;

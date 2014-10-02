@@ -40,6 +40,19 @@ subtest 'add application' => sub {
     is $info->{application}, 'Thunderbird';
 };
 
+subtest 'add category' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'MsgCompose',
+        class => '"MsgCompose", "Icedove"',
+        name  => 'Reply to: '
+    };
+    $filter->run($info);
+
+    is $info->{category}, 'email';
+};
+
 sub _build_filter {
     return App::Chronos::Application::Thunderbird->new;
 }

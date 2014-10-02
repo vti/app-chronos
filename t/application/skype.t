@@ -40,6 +40,19 @@ subtest 'add application' => sub {
     is $info->{application}, 'Skype';
 };
 
+subtest 'add category' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'ConversationsWindow',
+        class => '"skype", "Skype"',
+        name  => 'contact - Skype'
+    };
+    my $ok = $filter->run($info);
+
+    is $info->{category}, 'im';
+};
+
 subtest 'add contact' => sub {
     my $filter = _build_filter();
 

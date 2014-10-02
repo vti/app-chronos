@@ -13,11 +13,13 @@ sub run {
     my ($info) = @_;
 
     return
-      unless $info->{role} =~ 'browser'
+         unless $info->{role} =~ 'browser'
       && $info->{class} =~ 'Navigator'
       && $info->{name} =~ m/(?:Iceweasel|Firefox)/;
 
     $info->{application} = 'Firefox';
+    $info->{category}    = 'browser';
+
     $info->{url} = $self->_find_current_url;
 
     return 1;

@@ -99,6 +99,20 @@ subtest 'add application' => sub {
     is $info->{application}, 'Firefox';
 };
 
+subtest 'add category' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => 'browser',
+        class => 'Navigator',
+        name  => 'Firefox'
+    };
+
+    my $ok = $filter->run($info);
+
+    is $info->{category}, 'browser';
+};
+
 sub _build_filter {
     my (%params) = @_;
 

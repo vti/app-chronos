@@ -40,6 +40,19 @@ subtest 'add application' => sub {
     is $info->{application}, 'Pidgin';
 };
 
+subtest 'add category' => sub {
+    my $filter = _build_filter();
+
+    my $info = {
+        role  => '"conversation"',
+        class => '"Pidgin", "Pidgin"',
+        name  => 'name'
+    };
+    my $ok = $filter->run($info);
+
+    is $info->{category}, 'im';
+};
+
 subtest 'add contact' => sub {
     my $filter = _build_filter();
 

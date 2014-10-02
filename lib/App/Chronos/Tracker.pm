@@ -50,6 +50,7 @@ sub track {
 
     $info->{$_} //= '' for (qw/id name role class/);
     $info->{application} ||= 'other';
+    $info->{category}    ||= 'other';
 
     if (  !$prev->{id}
         || $info->{id} ne $prev->{id}

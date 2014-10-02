@@ -146,6 +146,7 @@ subtest 'run on_end on end' => sub {
             _end        => 123,
             id          => 'foo',
             application => 'other',
+            category    => 'other',
             name        => '',
             class       => '',
             role        => ''

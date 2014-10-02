@@ -12,11 +12,13 @@ sub run {
     my ($info) = @_;
 
     return
-      unless $info->{role} =~ m/browser/
+         unless $info->{role} =~ m/browser/
       && $info->{name} =~ m/Chromium/
       && $info->{class} =~ m/Chromium/;
 
     $info->{application} = 'Chromium';
+    $info->{category}    = 'browser';
+
     $info->{url} = $self->_find_current_url;
 
     return 1;

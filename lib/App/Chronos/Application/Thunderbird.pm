@@ -12,6 +12,7 @@ sub run {
     return unless $info->{class} =~ m/(?:Thunderbird|Icedove)"$/;
 
     $info->{application} = 'Thunderbird';
+    $info->{category}    = 'email';
 
     return 1;
 }
