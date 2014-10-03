@@ -37,6 +37,7 @@ subtest 'create idle when idle' => sub {
     $tracker->track;
 
     ok $args[0]->{idle};
+    is $args[0]->{category}, '';
 };
 
 subtest 'finish previous activity when idle' => sub {
