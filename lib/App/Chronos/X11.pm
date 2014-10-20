@@ -3,6 +3,8 @@ package App::Chronos::X11;
 use strict;
 use warnings;
 
+use Encode;
+
 sub new {
     my $class = shift;
 
@@ -36,6 +38,8 @@ sub _get_window_info {
     ($info->{name})    = $dump =~ m/WM_NAME\(.*?\) = (.*)/m;
     ($info->{role})    = $dump =~ m/WM_WINDOW_ROLE\(STRING\) = (.*)/m;
     ($info->{command}) = $dump =~ m/WM_COMMAND\(.*?\) = (.*)/m;
+
+    $info->{name} = decode('UTF-8', $info->{name});
 
     $info->{$_} //= '' for keys %$info;
 
