@@ -7,6 +7,8 @@ use Docopt;
 use App::Chronos;
 use App::Chronos::Report;
 
+use File::Which 'which';
+
 my $opts = docopt();
 
 if ($opts->{report}) {
@@ -21,6 +23,11 @@ if ($opts->{report}) {
     $report->run;
 }
 else {
+    my @paths = which('xprintidle');
+    if (!@paths) {
+        die "xprintidle is not installed";
+    }
+
     my $app = App::Chronos->new(
         logger        => 'stdout',
         idle_timeout  => $opts->{'--idle_timeout'},
