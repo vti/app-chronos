@@ -19,15 +19,16 @@ sub run {
     $info->{application} = 'Chromium';
     $info->{category}    = 'browser';
 
-    $info->{url} = $self->_find_current_url;
+    $info->{url} = $self->_find_current_url('chromium');
 
     return 1;
 }
 
 sub _find_current_url {
     my $self = shift;
+    my $program = shift;
 
-    my $file = "$ENV{HOME}/.config/chromium/Default/Current Session";
+    my $file = sprintf '%s/.config/%s/Default/Current Session', $ENV{HOME}, $program;
     my $current_session = do { local $/; open my $fh, '<', $file; <$fh> };
 
     my ($sig, $version, @commands) = unpack("LL(v/a)*", $current_session);
