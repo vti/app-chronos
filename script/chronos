@@ -43,6 +43,12 @@ else {
 
 __END__
 
+=encoding utf-8
+
+=head1 NAME
+
+chronos - automatic time tracking application
+
 =head1 SYNOPSIS
 
   chronos [--timeout=<seconds>]
@@ -51,5 +57,127 @@ __END__
                  [--from=<time>] [--to=<time>]
   chronos -h | --help
 
-  --timeout=<seconds> Timeout between runs [default: 5].
-  -h --help           Show this screen.
+  --timeout=<seconds>       Timeout between runs [default: 5].
+  --idle_timeout=<seconds>  How long of inactivity is considered an idle time [default: 5].
+  --flush_timeout=<seconds> How often flush log file [default: 5].
+  --fields                  List of fields.
+  --where                   Where clause as Perl code.
+  --group_by                List of fields to group the results.
+  -h --help                 Show this screen.
+
+=head1 DESCRIPTION
+
+L<chronos> is an automatic time tracking application. It automatically record
+how long you have spent on any application. It does so by detecting the current
+active X11 window. The result is a JSON object that is printed to the standard
+output, thus can be saved to any file and analyzed later.
+
+=head2 Tracking
+
+=head3 Timeout
+
+How often the data is collected is controlled by C<timeout> option. This is
+5 minutes by default. This is implemented as a simple C<sleep> function call.
+
+=head3 Idle time
+
+Idle time is a big problem. You don't want to record the time when you're away
+from the computer, but you also don't want to switch of the tracking app also,
+since I personally would never remember that. L<chronos> has a C<idle_timeout>
+option that allows you to specify how long is idle. By default it is 5 minutes.
+
+=head3 Flushing
+
+Sometimes the activity can be lost due to a bug in software, a power outage or
+anything else. You don't want to loose the time that you have been working on
+a long project. L<chronos> solves this problem by flushing the activity every
+specified period, C<flush_timeout> option. By default it is 5 minutes.
+
+=head3 Details
+
+When a specific application is detected there could be an additional data added.
+For example in case of a browser, C<chronos> tries to find out what is the
+currently visited URL and adds a C<url> key to the output log.
+
+Any other application can add its own data. Writing an application filter is
+very easy, for example here is the Skype filter:
+
+    package App::Chronos::Application::Skype;
+
+    use strict;
+    use warnings;
+
+    use base 'App::Chronos::Application::Base';
+
+    sub run {
+        my $self = shift;
+        my ($info) = @_;
+
+        return
+             unless $info->{role} =~ m/ConversationsWindow/
+          && $info->{class} =~ m/Skype/
+          && $info->{name} =~ m/Skype/;
+
+        $info->{application} = 'Skype';
+        $info->{category}    = 'im';
+
+        ($info->{contact}) = $info->{name} =~ m/^"(?:\[\d+\])?(.*?) - Skype/;
+
+        return 1;
+    }
+
+    1;
+
+First we skip everything that doesn't look like a Skype window, then we parse
+the contact name. And then when using C<report> command we can filter Skype
+activities, group them by a contact name and find out with who we are talking
+the most.
+
+=head2 Reporting
+
+Reporting is another important part despite recording. You want to have an
+efficient and understandable way to report how long you have spent on any
+activity. This is where C<report> command comes in. Using C<where>, C<group_by>
+and C<fields> options one can control how to filter the collected data.
+
+=head3 Filtering
+
+Log file looks like this:
+
+    {
+       "_end" : 1412682230,
+       "_start" : 1412682225,
+       "application" : "other",
+       "category" : "other",
+       "class" : "\"xfce4-terminal\", \"Xfce4-terminal\"",
+       "command" : "",
+       "id" : "0x4000004",
+       "name" : "\"Terminal - vti@mars: ~/dev/app-chronos\"",
+       "role" : "\"xfce4-terminal-1412149848--829716334\""
+    }
+
+By using C<fields> option you can control what fields to report. By using
+C<where> option you can filter keys and values, by using C<group_by> you can
+group the results.
+
+C<fields> is a list of keys. For example:
+
+    chronos report --fields 'category,application'
+
+C<where> is a Perl code that is evaluation and executed on every log line. Every
+key must be prefixed with a C<$> sign, like a Perl variable, for example:
+
+    chronos report --where '$name =~ m/Terminal/'
+
+This will report all lines that contain C<name> key with value matching the
+regular expression. This is a very powerful mechanizm which gives a lot of
+freedom.
+
+C<group_by> is a list of keys. For example:
+
+    chronos report --group_by 'category,application'
+
+Here is a more advance example how to report top visited URLs:
+
+    chronos report --fields 'url' --where '$category eq "browser"' \
+        --group_by 'url' log

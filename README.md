@@ -1,6 +1,6 @@
 # NAME
 
-App::Chronos - It's new $module
+App::Chronos - automatic time tracking application
 
 # SYNOPSIS
 
@@ -8,15 +8,20 @@ App::Chronos - It's new $module
 
 # DESCRIPTION
 
-App::Chronos is ...
+App::Chronos is a class used in `chronos`. You better look into the script
+documentation.
 
 # LICENSE
 
-Copyright (C) vti.
+Copyright (C) Viacheslav Tykhanovskyi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+# CREDITS
+
+Peter Stuifzand
+
 # AUTHOR
 
-vti <viacheslav.t@gmail.com>
+Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>

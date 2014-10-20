@@ -60,7 +60,7 @@ __END__
 
 =head1 NAME
 
-App::Chronos - It's new $module
+App::Chronos - automatic time tracking application
 
 =head1 SYNOPSIS
 
@@ -68,18 +68,23 @@ App::Chronos - It's new $module
 
 =head1 DESCRIPTION
 
-App::Chronos is ...
+App::Chronos is a class used in C<chronos>. You better look into the script
+documentation.
 
 =head1 LICENSE
 
-Copyright (C) vti.
+Copyright (C) Viacheslav Tykhanovskyi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+=head1 CREDITS
+
+Peter Stuifzand
+
 =head1 AUTHOR
 
-vti E<lt>viacheslav.t@gmail.comE<gt>
+Viacheslav Tykhanovskyi E<lt>viacheslav.t@gmail.comE<gt>
 
 =cut
 

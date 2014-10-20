@@ -1,10 +1,10 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "automatic time tracking application",
    "author" : [
-      "vti <viacheslav.t@gmail.com>"
+      "Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Minilla/v2.1.1, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -42,16 +42,35 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "Docopt" : "0",
+            "File::Which" : "0",
+            "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
+            "Test::MockTime" : "0",
+            "Test::MonkeyMock" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/app-chronos/issues"
+      },
+      "homepage" : "https://github.com/vti/app-chronos",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/vti/app-chronos.git",
+         "web" : "https://github.com/vti/app-chronos"
+      }
+   },
    "version" : "0.01",
-   "x_authority" : "cpan:VTI"
+   "x_authority" : "cpan:VTI",
+   "x_contributors" : [
+      "Peter Stuifzand <peter@stuifzand.eu>",
+      "Peter Stuifzand <peter.stuifzand@gmail.com>"
+   ]
 }
