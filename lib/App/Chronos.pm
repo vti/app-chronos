@@ -13,6 +13,7 @@ use App::Chronos::Application::Skype;
 use App::Chronos::Application::Pidgin;
 use App::Chronos::Application::Thunderbird;
 use App::Chronos::Application::GnomeTerminal;
+use App::Chronos::Application::GoogleChrome;
 
 sub new {
     my $class = shift;
@@ -27,6 +28,7 @@ sub new {
         flush_timeout => $params{flush_timeout},
         applications  => [
             App::Chronos::Application::Firefox->new,
+            App::Chronos::Application::GoogleChrome->new,
             App::Chronos::Application::Chromium->new,
             App::Chronos::Application::Skype->new,
             App::Chronos::Application::Pidgin->new,
