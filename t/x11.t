@@ -5,6 +5,8 @@ use Test::More;
 use Test::MonkeyMock;
 use App::Chronos::X11;
 
+use Encode;
+
 subtest 'parse xprop results' => sub {
     my $x11 = _build_x11(
         '-root _NET_ACTIVE_WINDOW' =>
@@ -49,6 +51,30 @@ EOM
         'name'    => '"foo"',
         'role'    => '"conversation"',
         'class'   => '"Pidgin", "Pidgin"',
+        'command' => ''
+      };
+};
+
+subtest 'parse xprop results with UTF-8 name' => sub {
+    my $x11 = _build_x11(
+        '-root _NET_ACTIVE_WINDOW' =>
+          '_NET_ACTIVE_WINDOW(WINDOW): window id # 0x0000001, 0x0',
+        '-id 0x0000001' => encode('UTF-8', <<'EOM'),
+WM_WINDOW_ROLE(STRING) = "music-player"
+WM_CLASS(STRING) = "Music", "Music"
+WM_NAME(SOMETHING ELSE) = "♫ My Music"
+_NET_WM_NAME(UTF8_STRING) = "♫ My Music"
+EOM
+    );
+
+    my $info = $x11->get_active_window();
+
+    is_deeply $info,
+      {
+        'id'      => '0x0000001',
+        'name'    => '"♫ My Music"',
+        'role'    => '"music-player"',
+        'class'   => '"Music", "Music"',
         'command' => ''
       };
 };
