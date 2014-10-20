@@ -58,9 +58,12 @@ sub _parse_current_session {
 
 sub _slurp_session {
     my $self = shift;
-
     my ($session_file) =
       glob "$ENV{HOME}/.mozilla/firefox/*default/sessionstore.js";
+    if (!$session_file ||!-e $session_file) {
+      ($session_file) =
+        glob "$ENV{HOME}/.mozilla/firefox/*default/sessionstore-backups/recovery.js";
+    }
     return do { local $/; open my $fh, '<', $session_file; <$fh> };
 }
 
