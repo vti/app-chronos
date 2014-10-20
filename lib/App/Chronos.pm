@@ -12,6 +12,7 @@ use App::Chronos::Application::Chromium;
 use App::Chronos::Application::Skype;
 use App::Chronos::Application::Pidgin;
 use App::Chronos::Application::Thunderbird;
+use App::Chronos::Application::GnomeTerminal;
 
 sub new {
     my $class = shift;
@@ -30,6 +31,7 @@ sub new {
             App::Chronos::Application::Skype->new,
             App::Chronos::Application::Pidgin->new,
             App::Chronos::Application::Thunderbird->new,
+            App::Chronos::Application::GnomeTerminal->new,
         ],
         on_end => sub {
             my ($info) = @_;
