@@ -5,11 +5,9 @@ use warnings;
 
 use base 'App::Chronos::Application::Base';
 
-use Data::Dumper;
 sub run {
     my $self = shift;
     my ($info) = @_;
-    print STDERR Dumper($info);
 
     return
          unless $info->{role} =~ m/gnome-terminal/
