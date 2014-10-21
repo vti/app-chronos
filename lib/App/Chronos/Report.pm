@@ -115,6 +115,7 @@ sub calculate_sig {
         $sig .= $record->{$group_by} . ':';
     }
 
+    utf8::encode($sig);
     return Digest::MD5::md5_hex($sig);
 }
 
