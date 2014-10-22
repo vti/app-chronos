@@ -7,6 +7,7 @@ use Time::Piece;
 use JSON        ();
 use Digest::MD5 ();
 use App::Chronos::Utils qw(parse_time);
+use Encode;
 
 sub new {
     my $class = shift;
@@ -115,7 +116,7 @@ sub calculate_sig {
         $sig .= $record->{$group_by} . ':';
     }
 
-    utf8::encode($sig);
+    $sig = Encode::encode('UTF-8', $sig);
     return Digest::MD5::md5_hex($sig);
 }
 
